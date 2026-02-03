@@ -1,0 +1,7 @@
+[project]
+name = "sense-concordance"
+version = "0.1.0"
+description = "Populating a New Testament concordance based on word alignments and Greek senses"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
