@@ -1,2 +1,2 @@
 # sense-concordance
-Populating a New Testament concordance based on words alignments and Greek senses
+Populating a New Testament concordance based on word alignments and Greek senses
