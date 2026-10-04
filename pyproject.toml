@@ -7,4 +7,11 @@ requires-python = ">=3.12"
 dependencies = [
     "acailib>=0.1.5",
     "biblealignlib>=0.2.5",
+    "acai",
 ]
+
+[tool.uv.sources]
+acai = { path = "/Users/seanboisen/git/Clear-Bible/ACAI", editable = true }
+
+[tool.uv]
+override-dependencies = ["biblelib>=0.5.2,<0.6.0"]
