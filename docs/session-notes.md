@@ -35,3 +35,32 @@
 
 ## Next steps
 - None required for this step; it's done. Future: use these two JSON files to drive the HTML concordance display (not yet started/designed — AGENTS.md still says "Content Architecture: TBD").
+
+## Session 2: HTML sense-page renderer
+
+### Key decisions
+- Generate one example sense page first (`60.22`, "fourteen") to validate the template before batching all 6,729 senses — per user's answer.
+- Output location: `html/senses/<entryCode>.html`, with sense-code links as relative paths within that folder (e.g. `href="10.28.html"`).
+- No cap/pagination on verse count per sense page, even for very frequent senses (e.g. `33.69` has 2,003 verses) — render everything.
+- Reused `biblelib.book.Books()["MAT"].usfmnumber` to convert a display ref (`"MAT 1:17"`) back to the numeric verse id (`"40001017"`) needed to look up `nt_BSB.tsv` rows, rather than changing `sense_verses.json`'s schema from the previous session.
+- Merge rule: consecutive BSB tokens sharing the exact same (possibly multi-code) sense-code set collapse into one `colspan` cell in the code row; tokens with no sense never merge with each other or with sensed neighbors, even if adjacent.
+
+### Status: done for the example page
+- `src/render_sense_page.py` written and run; `html/senses/60.22.html` generated and opened in browser.
+- Verified against raw data for MAT 1:17: "there were fourteen" (BSB ids 40001017006-008) correctly merge into one cell linking both `10.28` and `60.22` (confirmed both codes genuinely present on all three tokens via `bsb_sense_lookup.json`); "generations" (10.28 only) gets its own unmerged, unbolded cell; all three "fourteen" occurrences bold (page's own sense); commas/"then" render as separate empty cells, never merged.
+- HTML output validated as well-formed (no unclosed/mismatched tags).
+
+### Next steps
+- User to review `html/senses/60.22.html` visually; once approved, extend `main()` (or a new batch driver) to generate all 6,729 sense pages.
+
+## Session 3: quoting + small batch
+
+- Quoted `label.glosses` in the H1 (now renders as `60.22 — "fourteen" — ...`).
+- Extended `main()` in `src/render_sense_page.py` to generate a configurable batch (`ADDITIONAL_SENSE_COUNT = 30`) alongside the original example: picks the next 30 distinct sense codes in sorted order (`1.1` through `1.30`), plus `60.22`. 31 pages now in `html/senses/`.
+- Next: still not yet generating the full 6,729; batching logic is in place and just needs the count/selection raised if/when the user wants full coverage.
+
+## Session 4: tooltips on sense links
+
+- Added `sense_tooltip(code, sense_verses)` to `src/render_sense_page.py`, producing a `title="glosses — definitionShort"` attribute on every sense-code hyperlink (not just the page's own sense) — threaded `sense_verses` down through `render_sense_page` and `render_verse_row` so any linked code's label can be looked up, since a verse can link to codes other than the page's own.
+- Degrades gracefully for the 11 codes with no UBS lexicon entry (e.g. `13.1`): empty `title=""`, no error.
+- Regenerated all 31 existing pages; verified HTML still well-formed and spot-checked tooltip text against `data/sense_verses.json`.
